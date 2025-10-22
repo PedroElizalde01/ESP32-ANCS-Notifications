@@ -115,7 +115,6 @@ bool BLENotifications::begin(const char *name)
 	BLEDevice::init(name);
 	server = BLEDevice::createServer();
 	server->setCallbacks(new MyServerCallbacks(this));
-	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
 	BLEDevice::setSecurityCallbacks(new NotificationSecurityCallbacks()); // @todo memory leak?
 
 	startAdvertising();

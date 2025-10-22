@@ -79,7 +79,6 @@ void ANCSBLEClient::startClientTask(void *params)
 void ANCSBLEClient::setup(const BLEAddress *address)
 {
 	BLEClient *pClient = BLEDevice::createClient();
-	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
 	BLEDevice::setSecurityCallbacks(new NotificationSecurityCallbacks()); // @todo memory leak?
 
 	BLESecurity *pSecurity = new BLESecurity();
