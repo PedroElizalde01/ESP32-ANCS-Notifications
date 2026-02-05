@@ -82,8 +82,8 @@ void ANCSBLEClient::setup(const BLEAddress *address)
 	BLEDevice::setSecurityCallbacks(new NotificationSecurityCallbacks()); // @todo memory leak?
 
 	BLESecurity *pSecurity = new BLESecurity();
-	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_BOND);
-	pSecurity->setCapability(ESP_IO_CAP_IO);
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_BOND);
+	pSecurity->setCapability(ESP_IO_CAP_NONE);
 	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 	// Connect to the remote BLE Server.
 	if (!pClient->connect(*address))

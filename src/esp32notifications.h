@@ -82,6 +82,7 @@ private:
     class ANCSBLEClient *client;
 
     bool isAdvertising;
+    const char *deviceName;
 
     friend class MyServerCallbacks; // Allow internal handlers to access the callbacks of the main class
 };
