@@ -1,6 +1,5 @@
 /*
 Minimal iPhone ANCS notification example for ESP32.
-
 Steps:
 1) Boot ESP32 with pairing button held (GPIO33 to GND).
 2) iPhone: Settings → Bluetooth → pair with "beepr-ancs".
