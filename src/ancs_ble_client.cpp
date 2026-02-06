@@ -45,7 +45,7 @@ static void notificationSourceNotifyCallback(
 }
 
 ANCSBLEClient::ANCSBLEClient()
-		: notificationCB(nullptr), removedCB(nullptr), pControlPointCharacteristic(nullptr)
+		: notificationCB(nullptr), removedCB(nullptr), pControlPointCharacteristic(nullptr), pClient(nullptr)
 {
 	assert(sharedInstance == nullptr);
 	sharedInstance = this;
@@ -78,7 +78,7 @@ void ANCSBLEClient::startClientTask(void *params)
 
 void ANCSBLEClient::setup(const BLEAddress *address)
 {
-	BLEClient *pClient = BLEDevice::createClient();
+	pClient = BLEDevice::createClient();
 	BLEDevice::setSecurityCallbacks(new NotificationSecurityCallbacks()); // @todo memory leak?
 
 	BLESecurity *pSecurity = new BLESecurity();
@@ -127,6 +127,15 @@ void ANCSBLEClient::setup(const BLEAddress *address)
 	pDataSourceCharacteristic->getDescriptor(BLEUUID((uint16_t)0x2902))->writeValue((uint8_t *)v, 2, true);
 	pNotificationSourceCharacteristic->registerForNotify(notificationSourceNotifyCallback);
 	pNotificationSourceCharacteristic->getDescriptor(BLEUUID((uint16_t)0x2902))->writeValue((uint8_t *)v, 2, true);
+}
+
+void ANCSBLEClient::keepAlive()
+{
+	if (pClient && pClient->isConnected())
+	{
+		// Read RSSI as a minimal keep-alive that doesn't modify ANCS behavior.
+		(void)pClient->getRssi();
+	}
 }
 
 BLEUUID ANCSBLEClient::getAncsServiceUUID()

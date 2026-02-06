@@ -159,6 +159,14 @@ void BLENotifications::actionNegative(uint32_t uuid)
 	client->performAction(uuid, uint8_t(ANCS::NotificationActionNegative));
 }
 
+void BLENotifications::keepAlive()
+{
+	if (client)
+	{
+		client->keepAlive();
+	}
+}
+
 void BLENotifications::startAdvertising()
 {
 	ESP_LOGI(LOG_TAG, "startAdvertising()");
