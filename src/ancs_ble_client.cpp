@@ -24,6 +24,35 @@ const BLEUUID ancsServiceUUID("7905F431-B5CE-4E99-A40F-4B1E122D00D0");
 
 static ANCSBLEClient *sharedInstance;
 
+static int64_t daysFromCivil(int y, unsigned m, unsigned d)
+{
+	y -= m <= 2;
+	const int era = (y >= 0 ? y : y - 399) / 400;
+	const unsigned yoe = (unsigned)(y - era * 400);
+	const unsigned doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+	const unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+	return (int64_t)(era * 146097 + (int)doe - 719468);
+}
+
+static time_t parseAncsDate(const std::string &dateStr)
+{
+	if (dateStr.size() < 15)
+	{
+		return 0;
+	}
+
+	int y = (dateStr[0] - '0') * 1000 + (dateStr[1] - '0') * 100 + (dateStr[2] - '0') * 10 + (dateStr[3] - '0');
+	unsigned m = (dateStr[4] - '0') * 10 + (dateStr[5] - '0');
+	unsigned d = (dateStr[6] - '0') * 10 + (dateStr[7] - '0');
+	unsigned hh = (dateStr[9] - '0') * 10 + (dateStr[10] - '0');
+	unsigned mm = (dateStr[11] - '0') * 10 + (dateStr[12] - '0');
+	unsigned ss = (dateStr[13] - '0') * 10 + (dateStr[14] - '0');
+
+	int64_t days = daysFromCivil(y, m, d);
+	int64_t seconds = days * 86400 + hh * 3600 + mm * 60 + ss;
+	return (time_t)seconds;
+}
+
 static void dataSourceNotifyCallback(
 		BLERemoteCharacteristic *pDataSourceCharacteristic,
 		uint8_t *pData,
@@ -213,6 +242,10 @@ void ANCSBLEClient::onDataSourceNotify(
 	case 0x3:
 		notification->message = message;
 		ESP_LOGD(LOG_TAG, "got message: %s", message.c_str());
+		break;
+	case ANCS::NotificationAttributeIDDate:
+		notification->time = parseAncsDate(message);
+		ESP_LOGD(LOG_TAG, "got date: %s", message.c_str());
 		break;
 	}
 	if (!notification->title.empty() && !notification->message.empty())
